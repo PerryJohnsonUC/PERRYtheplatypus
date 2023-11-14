@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Honors Game Engine", "Honors Game Engine\Honors Game Engine.pyproj", "{1D7D68E5-9FCA-485A-9B8E-772CBD82872A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D7D68E5-9FCA-485A-9B8E-772CBD82872A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D7D68E5-9FCA-485A-9B8E-772CBD82872A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F670966-EF5D-49AC-8130-28BD258A3FFC}
+	EndGlobalSection
+EndGlobal
