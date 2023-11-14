@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>Honors Game Engine</Name>
     <RootNamespace>Honors Game Engine</RootNamespace>
+    <InterpreterId>MSBuild|GameEngineEnvironment|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Honors_Game_Engine.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="GameEngineEnvironment\">
+      <Id>GameEngineEnvironment</Id>
+      <Version>3.10</Version>
+      <Description>GameEngineEnvironment (Python 3.10)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
