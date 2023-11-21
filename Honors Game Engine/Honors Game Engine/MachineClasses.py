@@ -117,7 +117,7 @@ class Machine:
 						self.player_count = 1
 						self.active_player_index = 0
 						self.active_player = self.player_list[self.active_player_index]
-						pygame.mixer.music.load('Background.mp3')
+						pygame.mixer.music.load('worky.mp3')
 						pygame.mixer.music.play(-1)
 						self.machine_state = MachineStates.PLAY_MODE
 						

@@ -142,6 +142,7 @@ def basic_scoring(event: GameEvents, m_vars):
 class BackgroundImages():
     BEARCAT = pygame.transform.scale(pygame.image.load("Background_Images/Bearcat.png"),(1280,720))
     MONOGRAM = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
+    TREE = pygame.transform.scale(pygame.image.load("Background_Images/tree.jpg"),(1280,720))
     #Don't change this part
     def __init__(self) -> None:
         pass
@@ -306,7 +307,7 @@ def GenerateModeList():
         score = 0 #Initialize score to zero, if your rules don't change it, it will return zero (which is okay)
         animations = [] #List of graphic animations
         led_animations = [] #List of LED/Insert Animations
-        background = self.background_images.MONOGRAM #Background image, your rules can change this
+        background = self.background_images.TREE #Background image, your rules can change this
         self.alerts = [] #This is used for game engine debugging purposes (Don't set or change)
 
         #update state machine and state transitions here
