@@ -40,7 +40,7 @@ msg = [0x76]
 pygame.init()
 pygame.font.init()
 pygame.mixer.pre_init(44100,-16,1,1024)
-pygame.mixer.init();
+pygame.mixer.init()
 #Create game clock
 clock = pygame.time.Clock()
 
@@ -51,7 +51,7 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))  
 
 # set title
-pygame.display.set_caption('Honors Pinball Engine')
+pygame.display.set_caption('Honors Pinball Engine P&F')
 
 #Define starting background image
 background_name = "Background_Images/Monogram.png" 
@@ -63,6 +63,9 @@ test_machine = Machine()
 
 # run window
 running = True
+
+pygame.mixer.music.load('P&FTheme.mp3')
+pygame.mixer.music.play(-1)
 
 while running:
 

@@ -89,7 +89,7 @@ class Machine:
 	blink_count = 0
 	playfield_inserts = {} #Dictionary containing all playfield inserts
 	background = []
-	attract_background = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
+	attract_background = pygame.transform.scale(pygame.image.load("Background_Images/P&F.jpg"),(1280,720))
 
 	def __init__(self) -> None:
 		self.playfield_inserts = GeneratePlayfieldIndicators()
