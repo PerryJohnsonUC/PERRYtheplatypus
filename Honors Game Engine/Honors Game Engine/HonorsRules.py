@@ -141,6 +141,7 @@ class BackgroundImages():
     BEARCAT = pygame.transform.scale(pygame.image.load("Background_Images/Bearcat.png"),(1280,720))
     MONOGRAM = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
     TREE = pygame.transform.scale(pygame.image.load("Background_Images/tree.jpg"),(1280,720))
+    NORM = pygame.transform.scale(pygame.image.load("Background_Images/norm.jpg"),(1280,720))
     #Don't change this part
     def __init__(self) -> None:
         pass
