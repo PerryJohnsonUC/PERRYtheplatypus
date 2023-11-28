@@ -51,7 +51,7 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))  
 
 # set title
-pygame.display.set_caption('Honors Pinball Engine P&F')
+pygame.display.set_caption('Phineas and Ferb Pinball Machine')
 
 #Define starting background image
 background_name = "Background_Images/Monogram.png" 

@@ -67,14 +67,15 @@ class GameEvents(enum.Enum):
     #These events are specific to your particular machine and you can change these
     LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]    
     LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
-    CENTER_SPINNER =    [4,0x04],     [EventTypes.MAIN_SHOT,EventTypes.SPINNER,EventTypes.MODE_QUALIFIER]
     RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
     RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]
 
+    #events specific for our machine
     POP_0 =             [1,0x10],     [EventTypes.POP_BUMPER]
     POP_1 =             [1,0x20],     [EventTypes.POP_BUMPER]
-    POP_2 =             [1,0x40],     [EventTypes.POP_BUMPER]
     SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
+    SWITCH_1 =          [4,0x04],     [EventTypes.MAIN_SHOT,EventTypes.SWITCH_HIT,EventTypes.MODE_QUALIFIER]
+
 
 #These are the mappings between key presses on your keyboard and events.
 #This allows you to simulate events on the keyboard without the physical pinball hardware.
@@ -92,7 +93,6 @@ Keyboard_Mapping_Dict = {
     pygame.K_a:     GameEvents.SCOOP_0,
     pygame.K_s:     GameEvents.LEFT_ORBIT,
     pygame.K_d:     GameEvents.LEFT_RAMP_EXIT,
-    pygame.K_f:     GameEvents.CENTER_SPINNER,
     pygame.K_g:     GameEvents.RIGHT_RAMP_EXIT,
     pygame.K_h:     GameEvents.RIGHT_ORBIT,
     pygame.K_j:     None,
@@ -100,7 +100,6 @@ Keyboard_Mapping_Dict = {
     pygame.K_k:     None,
     pygame.K_z:     GameEvents.POP_0,
     pygame.K_x:     GameEvents.POP_1,
-    pygame.K_c:     GameEvents.POP_2,
     pygame.K_v:     None,
     pygame.K_b:     None,
     pygame.K_n:     None,
@@ -123,7 +122,6 @@ Default_Scoring_Dict = {
     GameEvents.SCOOP_0: 100,
     GameEvents.LEFT_ORBIT: 100,
     GameEvents.LEFT_RAMP_EXIT: 100,
-    GameEvents.CENTER_SPINNER: 100,
     GameEvents.RIGHT_RAMP_EXIT: 100,
     GameEvents.RIGHT_ORBIT: 100,
     GameEvents.LEFT_FLIPPER: 0,

@@ -10,7 +10,7 @@ from HonorsIndicator import SetIndicators
 class Machine_Settings:
 	balls_per_game = 3
 	ball_save_time = 20 #In seconds
-	n_max_players = 4
+	n_max_players = 2
 	def __init_(self):
 		pass
 
