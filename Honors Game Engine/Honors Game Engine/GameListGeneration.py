@@ -112,7 +112,7 @@ def general_mode_st(self,event: GameEvents,screen):
     
     return (score,light_show)
 
-
+#TODO
 def GenerateModeList():
 
     #Define Ball Lock internal states
