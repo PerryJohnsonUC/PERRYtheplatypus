@@ -30,6 +30,8 @@ class EventTypes(enum.Enum):
     SWITCH_HIT = enum.auto()
     MODE_QUALIFIER = enum.auto()
     STANDUP_TARGET = enum.auto()
+    DROP_TARGET = enum.auto()
+    IR_SENSOR = enum.auto()
 
 #Define Game Event enumerations
 class GameEvents(enum.Enum):
@@ -68,13 +70,13 @@ class GameEvents(enum.Enum):
     #These events are specific to your particular machine and you can change these
    # LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]     
     #LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
-    RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
-    RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]
+    RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT]
+    RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT]
 
     #events specific for our machine
     POP_0 =             [1,0x10],     [EventTypes.POP_BUMPER]
     POP_1 =             [1,0x20],     [EventTypes.POP_BUMPER]
-    SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
+  #  SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
 
     #NEW STUFF
     #Change addresses later for specific board placement
@@ -82,6 +84,9 @@ class GameEvents(enum.Enum):
     TARGET_2 =          [1, 0x2],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
     TARGET_3 =          [1, 0x4],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
     TARGET_4 =          [1, 0x8],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+
+    TRIPLE_TARGET =     [1, 0x16],    [EventTypes.DROP_TARGET, EventTypes.MAIN_SHOT]
+    IR_SENSOR =         [1, 0x32],    [EventTypes.IR_SENSOR, EventTypes.MODE_QUALIFIER]
 
 
 #These are the mappings between key presses on your keyboard and events.
@@ -97,7 +102,7 @@ Keyboard_Mapping_Dict = {
     pygame.K_u:     GameEvents.START_PUSH,
     
     pygame.K_i:     GameEvents.LAUNCH_SWITCH,
-    pygame.K_a:     GameEvents.SCOOP_0,
+ #   pygame.K_a:     GameEvents.SCOOP_0,
  #   pygame.K_s:     GameEvents.LEFT_ORBIT,
  #   pygame.K_d:     GameEvents.LEFT_RAMP_EXIT,
     pygame.K_g:     GameEvents.RIGHT_RAMP_EXIT,
@@ -126,19 +131,17 @@ Keyboard_Mapping_Dict = {
 #This is the default scoring for particular shots when there isn't a special score implemented within your rules
 Default_Scoring_Dict = {
     GameEvents.TIME_TICK: 0,
-    GameEvents.SCOOP_0: 100,
-  #  GameEvents.LEFT_ORBIT: 100,
-  #  GameEvents.LEFT_RAMP_EXIT: 100,
+  #  GameEvents.SCOOP_0: 100,
     GameEvents.RIGHT_RAMP_EXIT: 100,
     GameEvents.RIGHT_ORBIT: 100,
     GameEvents.LEFT_FLIPPER: 0,
     GameEvents.LEFT_STROKE: 0,
     GameEvents.RIGHT_FLIPPER: 0,
     GameEvents.RIGHT_STROKE: 0,
-    GameEvents.TARGET_1: 100,
-    GameEvents.TARGET_2: 100,
-    GameEvents.TARGET_3: 100,
-    GameEvents.TARGET_4: 100
+    GameEvents.TARGET_1: 50,
+    GameEvents.TARGET_2: 50,
+    GameEvents.TARGET_3: 50,
+    GameEvents.TARGET_4: 50
     }
    
 #Default Scoring for when an event/shot isn't part of the active mode
@@ -153,6 +156,8 @@ class BackgroundImages():
     MONOGRAM = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
     TREE = pygame.transform.scale(pygame.image.load("Background_Images/tree.jpg"),(1280,720))
     NORM = pygame.transform.scale(pygame.image.load("Background_Images/norm.jpg"),(1280,720))
+    COASTER = pygame.transform.scale(pygame.image.load("Background_Images/coaster.png"),(1280,720))
+
     #Don't change this part
     def __init__(self) -> None:
         pass
@@ -280,15 +285,13 @@ def GenerateModeList():
         MODE_QUALIFIED = enum.auto()
         #Once the scoop shot is made, the machine waits for you to select your mode
         MODE_SELECTION = enum.auto()
-        #Mode A has three diferrent stages you progress through
+        #Mode A is the standing targets to unlock the roller coaster
         MODE_A_0 = enum.auto()
         MODE_A_1 = enum.auto()
         MODE_A_2 = enum.auto()
-        #Mode B is time based and has just one state
+        MODE_A_3 = enum.auto()
+        #Mode B has just one state
         MODE_B = enum.auto()
-
-        #Mode C is for building and unlocking the roller coaster (ramp)
-        MODE_C = enum.auto()
 
     ##############################################################################################################
     #Mode Variable Class
@@ -299,7 +302,7 @@ def GenerateModeList():
             self.qualifying_shot_count = 0 #This keeps track of how many mode qualifying shots have been made
             self.mode_selection_index = 0 #This keeps track of which mode the user has selected
             self.time_count = 0 #This keeps track of the time remaining within Mode B
-            self.friend_count = 0 # keeps track of how many standing targets you hit
+            self.friend_count = 0 # keep3s track of how many standing targets you hit
 
     ##############################################################################################################
     #Mode State Transition Function
@@ -331,7 +334,7 @@ def GenerateModeList():
             case MainModeStates.QUALIFYING_MODES:
                 #These three line define a font, generate a text graphic using that font, then add the graphic animation to the list
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Hit Any Targets",True, (0,0,0))
+                mode_text = mode_font.render("Hit Center Drop Target",True, (0,0,0))
                 #append image_splash_hold animaiton to animations list. 
                 #Note that the duration is 1. This means it will only be shown for one frame, which is okay, because we redraw it every update 
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
@@ -342,11 +345,11 @@ def GenerateModeList():
                 #Check if event is from a qualifying shot. Note we are checking the types list of the event.
                 if EventTypes.MODE_QUALIFIER in event.types:
                     #Print debug output
-                    print('Qualifying Shot')
+                    print('')
                     #Create Shot Made text graphic and append to animation list
                     #Note this animation duration is 20 frames long.
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Shot Made",True, (0,0,0))
+                    mode_text = mode_font.render("",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(20,mode_text,mode_text.get_rect(center=(640,400))))
                     #Load and play sound effect for shot
                     shot_sound = pygame.mixer.Sound('blaster.wav')
@@ -365,12 +368,12 @@ def GenerateModeList():
             case MainModeStates.MODE_QUALIFIED:
                 #Create text graphic
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot The Scoop",True, (0,0,0))
+                mode_text = mode_font.render("Shoot into Doofenschmirtz Tower!",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #Light up the Scoop insert and set to blinking
                 led_animations.append(SetIndicators('test',1,[Inserts.SCOOP],False,30))
                 #Check if scoop shot
-                if event == GameEvents.SCOOP_0:
+                if event == GameEvents.IR_SENSOR:
                     #Update state to mode selection menu
                     self.current_state = MainModeStates.MODE_SELECTION
                     self.mode_vars.mode_selection_index = 0
@@ -403,12 +406,12 @@ def GenerateModeList():
                 if self.mode_vars.mode_selection_index == 0:
                     led_animations.append(SetIndicators('test',1,[Inserts.LEFT_RAMP],True,None))
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Mode A",True, (0,0,0))
+                    mode_text = mode_font.render("Roller Coaster Mode",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,400))))
                 else:
                     led_animations.append(SetIndicators('test',1,[Inserts.RIGHT_RAMP],True,None))
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Mode B",True, (0,0,0))
+                    mode_text = mode_font.render("Fight Norm Mode",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,400))))
                 
                 #If start button is hit, activate selected mode
@@ -433,10 +436,10 @@ def GenerateModeList():
             case MainModeStates.MODE_A_0:
                 #Instruct which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot the Left Ramp",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Standing Target 1",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If that shot was made, award 1000 points and progress to next state
-                if event == GameEvents.LEFT_RAMP_EXIT:
+                if event == GameEvents.TARGET_1:
                     score = 1000
                     self.current_state = MainModeStates.MODE_A_1
                 #If it was another shot, apply basic scoring
@@ -449,10 +452,10 @@ def GenerateModeList():
             case MainModeStates.MODE_A_1:
                 #Instruct player on which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot the Right Ramp",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Standing Target 2",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If correct shot was made, award 1000 points
-                if event == GameEvents.RIGHT_RAMP_EXIT:
+                if event == GameEvents.TARGET_2:
                     score = 1000
                     self.current_state = MainModeStates.MODE_A_2
                 else:
@@ -464,10 +467,10 @@ def GenerateModeList():
             case MainModeStates.MODE_A_2:
                 #Instruct which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot Center Spinner",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Standing Target 2",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If shot made award points
-                if event == GameEvents.CENTER_SPINNER:
+                if event == GameEvents.TARGET_3:
                     score = 5000
                     #End mode and go back to qualifying modes
                     self.current_state = MainModeStates.QUALIFYING_MODES
