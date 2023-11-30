@@ -340,6 +340,7 @@ def GenerateModeList():
         match self.current_state:
             #Currently qualifying a mode by making qualifying shots
             case MainModeStates.QUALIFYING_MODES:
+                
                 #These three line define a font, generate a text graphic using that font, then add the graphic animation to the list
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
                 mode_text = mode_font.render("Hit Triple Target",True, (0,0,0))
@@ -431,12 +432,11 @@ def GenerateModeList():
                     #Update state (for submodes) and change background music
                     if self.mode_vars.mode_selection_index == 0:
                         self.current_state = MainModeStates.MODE_A_0
-                        pygame.mixer.music.load('Salvation Code.mp3')
-                        pygame.mixer.music.play(-1)
+                        #pygame.mixer.music.load('.mp3')
+                        #pygame.mixer.music.play(-1)
                     else:
                         self.current_state = MainModeStates.MODE_B
-                        self.mode_vars.time_count = 900
-                        pygame.mixer.music.load('2517.mp3')
+                        pygame.mixer.music.load('normbots.mp3')
                         pygame.mixer.music.play(-1)
 
                 #Calculate score using basic scoring
@@ -545,8 +545,6 @@ def GenerateModeList():
                # mode_text = mode_font.render("Hit Pop Bumpers",True, (0,0,0))
                 mode_text = mode_font.render(f"Norm Health {self.mode_vars.norm_health}" ,True, (255,255,255))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
-                pygame.mixer.music.load('normbots.mp3')
-                pygame.mixer.music.play(-1)
                 if event == GameEvents.POP_0 or event == GameEvents.POP_1:
                     score = 500
                     self.mode_vars.norm_health -= 500
@@ -555,6 +553,8 @@ def GenerateModeList():
 
                 if self.mode_vars.norm_health <= 0:
                     self.current_state = MainModeStates.QUALIFYING_MODES
+                    pygame.mixer.music.load('worky.mp3')
+                    pygame.mixer.music.play(-1)
                     self.mode_vars.norm_health = 5000
                 #If ball ends, reset to qualifying modes
                 if event == GameEvents.BALL_END:
