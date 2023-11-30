@@ -29,6 +29,7 @@ class EventTypes(enum.Enum):
     LOOP_SHOT = enum.auto()
     SWITCH_HIT = enum.auto()
     MODE_QUALIFIER = enum.auto()
+    STANDUP_TARGET = enum.auto()
 
 #Define Game Event enumerations
 class GameEvents(enum.Enum):
@@ -65,8 +66,8 @@ class GameEvents(enum.Enum):
     LAUNCH_SWITCH =     [1,0x02],       []
 
     #These events are specific to your particular machine and you can change these
-    LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]    
-    LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
+   # LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]     
+    #LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
     RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
     RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]
 
@@ -74,7 +75,13 @@ class GameEvents(enum.Enum):
     POP_0 =             [1,0x10],     [EventTypes.POP_BUMPER]
     POP_1 =             [1,0x20],     [EventTypes.POP_BUMPER]
     SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
-    SWITCH_1 =          [4,0x04],     [EventTypes.MAIN_SHOT,EventTypes.SWITCH_HIT,EventTypes.MODE_QUALIFIER]
+
+    #NEW STUFF
+    #Change addresses later for specific board placement
+    TARGET_1 =          [1, 0x1],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_2 =          [1, 0x2],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_3 =          [1, 0x4],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_4 =          [1, 0x8],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
 
 
 #These are the mappings between key presses on your keyboard and events.
@@ -91,8 +98,8 @@ Keyboard_Mapping_Dict = {
     
     pygame.K_i:     GameEvents.LAUNCH_SWITCH,
     pygame.K_a:     GameEvents.SCOOP_0,
-    pygame.K_s:     GameEvents.LEFT_ORBIT,
-    pygame.K_d:     GameEvents.LEFT_RAMP_EXIT,
+ #   pygame.K_s:     GameEvents.LEFT_ORBIT,
+ #   pygame.K_d:     GameEvents.LEFT_RAMP_EXIT,
     pygame.K_g:     GameEvents.RIGHT_RAMP_EXIT,
     pygame.K_h:     GameEvents.RIGHT_ORBIT,
     pygame.K_j:     None,
@@ -100,10 +107,10 @@ Keyboard_Mapping_Dict = {
     pygame.K_k:     None,
     pygame.K_z:     GameEvents.POP_0,
     pygame.K_x:     GameEvents.POP_1,
-    pygame.K_v:     None,
-    pygame.K_b:     None,
-    pygame.K_n:     None,
-    pygame.K_m:     None,
+    pygame.K_v:     GameEvents.TARGET_1,
+    pygame.K_b:     GameEvents.TARGET_2,
+    pygame.K_n:     GameEvents.TARGET_3,
+    pygame.K_m:     GameEvents.TARGET_4,
     pygame.K_COMMA: None,
 
     pygame.K_LEFT:  GameEvents.LEFT_FLIPPER,
@@ -120,14 +127,18 @@ Keyboard_Mapping_Dict = {
 Default_Scoring_Dict = {
     GameEvents.TIME_TICK: 0,
     GameEvents.SCOOP_0: 100,
-    GameEvents.LEFT_ORBIT: 100,
-    GameEvents.LEFT_RAMP_EXIT: 100,
+  #  GameEvents.LEFT_ORBIT: 100,
+  #  GameEvents.LEFT_RAMP_EXIT: 100,
     GameEvents.RIGHT_RAMP_EXIT: 100,
     GameEvents.RIGHT_ORBIT: 100,
     GameEvents.LEFT_FLIPPER: 0,
     GameEvents.LEFT_STROKE: 0,
     GameEvents.RIGHT_FLIPPER: 0,
-    GameEvents.RIGHT_STROKE: 0
+    GameEvents.RIGHT_STROKE: 0,
+    GameEvents.TARGET_1: 100,
+    GameEvents.TARGET_2: 100,
+    GameEvents.TARGET_3: 100,
+    GameEvents.TARGET_4: 100
     }
    
 #Default Scoring for when an event/shot isn't part of the active mode
@@ -276,6 +287,9 @@ def GenerateModeList():
         #Mode B is time based and has just one state
         MODE_B = enum.auto()
 
+        #Mode C is for building and unlocking the roller coaster (ramp)
+        MODE_C = enum.auto()
+
     ##############################################################################################################
     #Mode Variable Class
     ##############################################################################################################
@@ -285,6 +299,7 @@ def GenerateModeList():
             self.qualifying_shot_count = 0 #This keeps track of how many mode qualifying shots have been made
             self.mode_selection_index = 0 #This keeps track of which mode the user has selected
             self.time_count = 0 #This keeps track of the time remaining within Mode B
+            self.friend_count = 0 # keeps track of how many standing targets you hit
 
     ##############################################################################################################
     #Mode State Transition Function
@@ -316,7 +331,7 @@ def GenerateModeList():
             case MainModeStates.QUALIFYING_MODES:
                 #These three line define a font, generate a text graphic using that font, then add the graphic animation to the list
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot Main Shots",True, (0,0,0))
+                mode_text = mode_font.render("Hit Any Targets",True, (0,0,0))
                 #append image_splash_hold animaiton to animations list. 
                 #Note that the duration is 1. This means it will only be shown for one frame, which is okay, because we redraw it every update 
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
