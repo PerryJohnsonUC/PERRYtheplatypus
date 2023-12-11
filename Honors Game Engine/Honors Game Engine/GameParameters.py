@@ -16,6 +16,7 @@ import types
 #For example, you may have a mode which looks for ramp shots, and you have three ramps in your game.
 #Instead of listing every possible ramp shot in the if statements, you can just check if the event of a ramp type.
 #Events can have more than one type.
+#TODO
 class EventTypes(enum.Enum):
 
     #Game Specific Events
@@ -29,7 +30,7 @@ class EventTypes(enum.Enum):
     LOOP_SHOT = enum.auto()
     SWITCH_HIT = enum.auto()
 
-
+#TODO
 #Define Game Event enumerations
 class GameEvents(enum.Enum):
 

@@ -129,6 +129,7 @@ Keyboard_Mapping_Dict = {
     pygame.K_SPACE: GameEvents.BALL_LAUNCH
 }   
 
+
 #This is the default scoring for particular shots when there isn't a special score implemented within your rules
 Default_Scoring_Dict = {
     GameEvents.TIME_TICK: 0,
@@ -176,6 +177,22 @@ class Inserts(enum.Enum):
     SCOOP = enum.auto()
     FIRE_TRIPLE = enum.auto()
     FIRE_COASTER_SOLONOID = enum.auto()
+    POPBUMPER_A = enum.auto()
+    POPBUMPER_B = enum.auto()
+
+    IR_TOWER = enum.auto()
+    IR_ROLLERCOASTER = enum.auto()
+    IR_RAMP = enum.auto()
+
+    ITALIAN_BOTTOM_RIGHT = enum.auto()
+    ITALIAN_BOTTOM_LEFT = enum.auto()
+
+    TRIPLE_DROP_TARGET = enum.auto()
+    ROLLERCOASTER_TARGET_A = enum.auto()
+    ROLLERCOASTER_TARGET_B = enum.auto()
+    FRIEND_TARGET_A = enum.auto()
+    FRIEND_TARGET_B = enum.auto()
+
     
 #This function generates a dictionary of all the playfield inserts/indicators
 #Each Insert/Indicator has four attributes that you will need to define
@@ -189,6 +206,7 @@ class Inserts(enum.Enum):
 #          and the second element defines which pin. The pin is defined as an 8-bit mask with a '1' in the postion corresponding
 #          to desired output. For example, if you have an insert connected to the second pin of Bank 1, you would define the output 
 #          mask as [1,0b00000010] if using binary representation or [1,0x02] if using hex representation. 
+#TODO change the driver mask
 def GeneratePlayfieldIndicators():
     temp_dict = {
         Inserts.LEFT_ORBIT: Indicator('Left Orbit',[7,0],[0,0x80]),
@@ -200,6 +218,19 @@ def GeneratePlayfieldIndicators():
         Inserts.SCOOP: Indicator('Scoop',[8,0],[1,0x01]),
         Inserts.FIRE_TRIPLE: Indicator('Triple_Drop',[1,0],[1, 0x16]),
         Inserts.FIRE_COASTER_SOLONOID: Indicator('Block Ramp', [1,0],[1, 0x64])
+        Inserts.FRIEND_TARGET_A: Indicator('',[0,0],[0,0x80]),
+        Inserts.FRIEND_TARGET_B: Indicator('',[0,0],[0,0x40]),
+        Inserts.ITALIAN_BOTTOM_LEFT: Indicator('',[0,0],[0,0x08]),
+        Inserts.ITALIAN_BOTTOM_RIGHT: Indicator('',[0,0],[0,0x04]),
+        Inserts.POPBUMPER_A: Indicator('',[0,0],[1,0x01]),
+        Inserts.POPBUMPER_B: Indicator('',[0,0],[1,0x01]),
+        Inserts.IR_TOWER: Indicator('',[0,0],[1,0x01]),
+        Inserts.IR_RAMP: Indicator('',[0,0],[1,0x01]),
+        Inserts.IR_ROLLERCOASTER: Indicator('',[8,0],[1,0x01]),
+        Inserts.IR_ROLLERCOASTER: Indicator('',[8,0],[1,0x01]),
+        Inserts.ROLLERCOASTER_TARGET_A: Indicator('',[8,0],[1,0x01]),
+        Inserts.ROLLERCOASTER_TARGET_B: Indicator('',[8,0],[1,0x01]),
+        Inserts.TRIPLE_DROP_TARGET: Indicator('',[8,0],[1,0x01])
         }
     return temp_dict
 
@@ -271,6 +302,7 @@ class GameMode:
 #This is a wrapper function that creates a list of all your modes.
 #Most of you will only need one mode (which may contain submodes), but hypothetically you
 #can have multiple modes running in parallel.
+#TODO
 def GenerateModeList():
     #You must define three things for each mode
     #Mode States Enumerator: This is an enumerator class in which you define the states of the mode
