@@ -29,6 +29,10 @@ class EventTypes(enum.Enum):
     LOOP_SHOT = enum.auto()
     SWITCH_HIT = enum.auto()
     MODE_QUALIFIER = enum.auto()
+    STANDUP_TARGET = enum.auto()
+    DROP_TARGET = enum.auto()
+    IR_SENSOR = enum.auto()
+    SOLONOID = enum.auto()
 
 #Define Game Event enumerations
 class GameEvents(enum.Enum):
@@ -65,16 +69,27 @@ class GameEvents(enum.Enum):
     LAUNCH_SWITCH =     [1,0x02],       []
 
     #These events are specific to your particular machine and you can change these
-    LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]    
-    LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
-    CENTER_SPINNER =    [4,0x04],     [EventTypes.MAIN_SHOT,EventTypes.SPINNER,EventTypes.MODE_QUALIFIER]
-    RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
-    RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]
+   # LEFT_ORBIT =        [4,0x01],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT,EventTypes.MODE_QUALIFIER]     
+    #LEFT_RAMP_EXIT =    [4,0x02],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT,EventTypes.MODE_QUALIFIER]
+    RIGHT_RAMP_EXIT =   [4,0x08],     [EventTypes.MAIN_SHOT,EventTypes.RAMP_SHOT]
+    RIGHT_ORBIT =       [4,0x10],     [EventTypes.MAIN_SHOT,EventTypes.ORBIT_SHOT]
 
+    #events specific for our machine
     POP_0 =             [1,0x10],     [EventTypes.POP_BUMPER]
     POP_1 =             [1,0x20],     [EventTypes.POP_BUMPER]
-    POP_2 =             [1,0x40],     [EventTypes.POP_BUMPER]
-    SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
+  #  SCOOP_0 =           [4,0x20],     [EventTypes.MAIN_SHOT]
+
+    #NEW STUFF
+    #Change addresses later for specific board placement
+    TARGET_1 =          [1, 0x1],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_2 =          [1, 0x2],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_3 =          [1, 0x4],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+    TARGET_4 =          [1, 0x8],     [EventTypes.STANDUP_TARGET, EventTypes.SWITCH_HIT]
+
+    TRIPLE_TARGET =     [1, 0x16],    [EventTypes.DROP_TARGET, EventTypes.MAIN_SHOT, EventTypes.MODE_QUALIFIER]
+    IR_SENSOR =         [1, 0x32],    [EventTypes.IR_SENSOR, EventTypes.MODE_QUALIFIER]
+    BLOCK_RAMP =        [1, 0x64],    [EventTypes.SOLONOID]
+
 
 #These are the mappings between key presses on your keyboard and events.
 #This allows you to simulate events on the keyboard without the physical pinball hardware.
@@ -89,10 +104,8 @@ Keyboard_Mapping_Dict = {
     pygame.K_u:     GameEvents.START_PUSH,
     
     pygame.K_i:     GameEvents.LAUNCH_SWITCH,
-    pygame.K_a:     GameEvents.SCOOP_0,
-    pygame.K_s:     GameEvents.LEFT_ORBIT,
-    pygame.K_d:     GameEvents.LEFT_RAMP_EXIT,
-    pygame.K_f:     GameEvents.CENTER_SPINNER,
+    pygame.K_a:     GameEvents.TRIPLE_TARGET,
+    pygame.K_s:     GameEvents.IR_SENSOR,
     pygame.K_g:     GameEvents.RIGHT_RAMP_EXIT,
     pygame.K_h:     GameEvents.RIGHT_ORBIT,
     pygame.K_j:     None,
@@ -100,11 +113,10 @@ Keyboard_Mapping_Dict = {
     pygame.K_k:     None,
     pygame.K_z:     GameEvents.POP_0,
     pygame.K_x:     GameEvents.POP_1,
-    pygame.K_c:     GameEvents.POP_2,
-    pygame.K_v:     None,
-    pygame.K_b:     None,
-    pygame.K_n:     None,
-    pygame.K_m:     None,
+    pygame.K_v:     GameEvents.TARGET_1,
+    pygame.K_b:     GameEvents.TARGET_2,
+    pygame.K_n:     GameEvents.TARGET_3,
+    pygame.K_m:     GameEvents.TARGET_4,
     pygame.K_COMMA: None,
 
     pygame.K_LEFT:  GameEvents.LEFT_FLIPPER,
@@ -121,16 +133,18 @@ Keyboard_Mapping_Dict = {
 #This is the default scoring for particular shots when there isn't a special score implemented within your rules
 Default_Scoring_Dict = {
     GameEvents.TIME_TICK: 0,
-    GameEvents.SCOOP_0: 100,
-    GameEvents.LEFT_ORBIT: 100,
-    GameEvents.LEFT_RAMP_EXIT: 100,
-    GameEvents.CENTER_SPINNER: 100,
+  #  GameEvents.SCOOP_0: 100,
     GameEvents.RIGHT_RAMP_EXIT: 100,
     GameEvents.RIGHT_ORBIT: 100,
     GameEvents.LEFT_FLIPPER: 0,
     GameEvents.LEFT_STROKE: 0,
     GameEvents.RIGHT_FLIPPER: 0,
-    GameEvents.RIGHT_STROKE: 0
+    GameEvents.RIGHT_STROKE: 0,
+    GameEvents.TARGET_1: 50,
+    GameEvents.TARGET_2: 50,
+    GameEvents.TARGET_3: 50,
+    GameEvents.TARGET_4: 50,
+    GameEvents.TRIPLE_TARGET: 25
     }
    
 #Default Scoring for when an event/shot isn't part of the active mode
@@ -143,6 +157,10 @@ def basic_scoring(event: GameEvents, m_vars):
 class BackgroundImages():
     BEARCAT = pygame.transform.scale(pygame.image.load("Background_Images/Bearcat.png"),(1280,720))
     MONOGRAM = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
+    TREE = pygame.transform.scale(pygame.image.load("Background_Images/tree.jpg"),(1280,720))
+    NORM = pygame.transform.scale(pygame.image.load("Background_Images/norm.jpg"),(1280,720))
+    COASTER = pygame.transform.scale(pygame.image.load("Background_Images/coaster.png"),(1280,720))
+
     #Don't change this part
     def __init__(self) -> None:
         pass
@@ -150,6 +168,15 @@ class BackgroundImages():
 #These are all of the different inserts you have on your playfield.
 #You can change these and name them whatever you want
 class Inserts(enum.Enum):
+    LEFT_ORBIT = enum.auto()
+    LEFT_RAMP = enum.auto()
+    CENTER_SPINNER = enum.auto()
+    RIGHT_RAMP = enum.auto()
+    NEWTON = enum.auto()
+    RIGHT_ORBIT = enum.auto()
+    SCOOP = enum.auto()
+    FIRE_TRIPLE = enum.auto()
+    FIRE_COASTER_SOLONOID = enum.auto()
     POPBUMPER_A = enum.auto()
     POPBUMPER_B = enum.auto()
 
@@ -165,8 +192,6 @@ class Inserts(enum.Enum):
     ROLLERCOASTER_TARGET_B = enum.auto()
     FRIEND_TARGET_A = enum.auto()
     FRIEND_TARGET_B = enum.auto()
-
-
 
     
 #This function generates a dictionary of all the playfield inserts/indicators
@@ -184,6 +209,15 @@ class Inserts(enum.Enum):
 #TODO change the driver mask
 def GeneratePlayfieldIndicators():
     temp_dict = {
+        Inserts.LEFT_ORBIT: Indicator('Left Orbit',[7,0],[0,0x80]),
+        Inserts.LEFT_RAMP: Indicator('Left Shot',[6,0],[0,0x40]),
+        Inserts.CENTER_SPINNER: Indicator('Center Spinner',[5,0],[0,0x20]),
+        Inserts.NEWTON: Indicator('Netwon',[4,0],[0,0x10]),
+        Inserts.RIGHT_RAMP: Indicator('Right Shot',[4,0],[0,0x08]),
+        Inserts.RIGHT_ORBIT: Indicator('Orbit',[4,0],[0,0x04]),
+        Inserts.SCOOP: Indicator('Scoop',[8,0],[1,0x01]),
+        Inserts.FIRE_TRIPLE: Indicator('Triple_Drop',[1,0],[1, 0x16]),
+        Inserts.FIRE_COASTER_SOLONOID: Indicator('Block Ramp', [1,0],[1, 0x64])
         Inserts.FRIEND_TARGET_A: Indicator('',[0,0],[0,0x80]),
         Inserts.FRIEND_TARGET_B: Indicator('',[0,0],[0,0x40]),
         Inserts.ITALIAN_BOTTOM_LEFT: Indicator('',[0,0],[0,0x08]),
@@ -289,11 +323,15 @@ def GenerateModeList():
         MODE_QUALIFIED = enum.auto()
         #Once the scoop shot is made, the machine waits for you to select your mode
         MODE_SELECTION = enum.auto()
-        #Mode A has three diferrent stages you progress through
+
+        #Mode A is the standing targets to unlock the roller coaster
         MODE_A_0 = enum.auto()
         MODE_A_1 = enum.auto()
         MODE_A_2 = enum.auto()
-        #Mode B is time based and has just one state
+        MODE_A_3 = enum.auto()
+        MODE_A_4 = enum.auto()
+
+        #Mode B has just one state
         MODE_B = enum.auto()
 
     ##############################################################################################################
@@ -304,7 +342,8 @@ def GenerateModeList():
         def __init__(self):
             self.qualifying_shot_count = 0 #This keeps track of how many mode qualifying shots have been made
             self.mode_selection_index = 0 #This keeps track of which mode the user has selected
-            self.time_count = 0 #This keeps track of the time remaining within Mode B
+            self.norm_health = 5000 # keeps track of enemy health in battle mode
+
 
     ##############################################################################################################
     #Mode State Transition Function
@@ -326,17 +365,17 @@ def GenerateModeList():
         score = 0 #Initialize score to zero, if your rules don't change it, it will return zero (which is okay)
         animations = [] #List of graphic animations
         led_animations = [] #List of LED/Insert Animations
-        background = self.background_images.MONOGRAM #Background image, your rules can change this
+        background = self.background_images.TREE #Background image, your rules can change this
         self.alerts = [] #This is used for game engine debugging purposes (Don't set or change)
-
         #update state machine and state transitions here
         #Case statement based on current mode state
         match self.current_state:
             #Currently qualifying a mode by making qualifying shots
             case MainModeStates.QUALIFYING_MODES:
+                
                 #These three line define a font, generate a text graphic using that font, then add the graphic animation to the list
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot Main Shots",True, (0,0,0))
+                mode_text = mode_font.render("Hit Triple Target",True, (0,0,0))
                 #append image_splash_hold animaiton to animations list. 
                 #Note that the duration is 1. This means it will only be shown for one frame, which is okay, because we redraw it every update 
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
@@ -347,11 +386,11 @@ def GenerateModeList():
                 #Check if event is from a qualifying shot. Note we are checking the types list of the event.
                 if EventTypes.MODE_QUALIFIER in event.types:
                     #Print debug output
-                    print('Qualifying Shot')
+                    print('')
                     #Create Shot Made text graphic and append to animation list
                     #Note this animation duration is 20 frames long.
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Shot Made",True, (0,0,0))
+                    mode_text = mode_font.render("Triple Target Hit!",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(20,mode_text,mode_text.get_rect(center=(640,400))))
                     #Load and play sound effect for shot
                     shot_sound = pygame.mixer.Sound('blaster.wav')
@@ -370,18 +409,20 @@ def GenerateModeList():
             case MainModeStates.MODE_QUALIFIED:
                 #Create text graphic
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot The Scoop",True, (0,0,0))
+                mode_text = mode_font.render("Shoot into Tower!",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #Light up the Scoop insert and set to blinking
-                led_animations.append(SetIndicators('test',1,[Inserts.SCOOP],False,30))
+               # led_animations.append(SetIndicators('test',1,[Inserts.SCOOP],False,30))
                 #Check if scoop shot
-                if event == GameEvents.SCOOP_0:
+                if event == GameEvents.IR_SENSOR:
                     #Update state to mode selection menu
                     self.current_state = MainModeStates.MODE_SELECTION
                     self.mode_vars.mode_selection_index = 0
+                    led_animations.append(SetIndicators('Fire Triple Drop', 1, [Inserts.FIRE_TRIPLE],True,None))
                 #Update score using basic scoring rules
                 score = basic_scoring(event,self.mode_vars)
             #Mode scoop shot and currently selecting mode
+            
             case MainModeStates.MODE_SELECTION:
                 #Create "select your mode" text graphic
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
@@ -408,12 +449,12 @@ def GenerateModeList():
                 if self.mode_vars.mode_selection_index == 0:
                     led_animations.append(SetIndicators('test',1,[Inserts.LEFT_RAMP],True,None))
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Mode A",True, (0,0,0))
+                    mode_text = mode_font.render("Roller Coaster Mode",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,400))))
                 else:
                     led_animations.append(SetIndicators('test',1,[Inserts.RIGHT_RAMP],True,None))
                     mode_font = pygame.font.Font('Guardians.ttf', 72)
-                    mode_text = mode_font.render("Mode B",True, (0,0,0))
+                    mode_text = mode_font.render("Fight Norm Mode",True, (0,0,0))
                     animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,400))))
                 
                 #If start button is hit, activate selected mode
@@ -423,12 +464,11 @@ def GenerateModeList():
                     #Update state (for submodes) and change background music
                     if self.mode_vars.mode_selection_index == 0:
                         self.current_state = MainModeStates.MODE_A_0
-                        pygame.mixer.music.load('Salvation Code.mp3')
-                        pygame.mixer.music.play(-1)
+                        #pygame.mixer.music.load('.mp3')
+                        #pygame.mixer.music.play(-1)
                     else:
                         self.current_state = MainModeStates.MODE_B
-                        self.mode_vars.time_count = 900
-                        pygame.mixer.music.load('2517.mp3')
+                        pygame.mixer.music.load('normbots.mp3')
                         pygame.mixer.music.play(-1)
 
                 #Calculate score using basic scoring
@@ -436,12 +476,14 @@ def GenerateModeList():
 
             #The first step of the Mode A sequence of shots
             case MainModeStates.MODE_A_0:
+                background = self.background_images.COASTER
+
                 #Instruct which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot the Left Ramp",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Target 1",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If that shot was made, award 1000 points and progress to next state
-                if event == GameEvents.LEFT_RAMP_EXIT:
+                if event == GameEvents.TARGET_1:
                     score = 1000
                     self.current_state = MainModeStates.MODE_A_1
                 #If it was another shot, apply basic scoring
@@ -452,12 +494,14 @@ def GenerateModeList():
                     self.current_state = MainModeStates.QUALIFYING_MODES
             #The second shot of Mode A
             case MainModeStates.MODE_A_1:
+                background = self.background_images.COASTER
+
                 #Instruct player on which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot the Right Ramp",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Target 2",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If correct shot was made, award 1000 points
-                if event == GameEvents.RIGHT_RAMP_EXIT:
+                if event == GameEvents.TARGET_2:
                     score = 1000
                     self.current_state = MainModeStates.MODE_A_2
                 else:
@@ -467,13 +511,55 @@ def GenerateModeList():
                     self.current_state = MainModeStates.QUALIFYING_MODES
             #The third and final shot of Mode A
             case MainModeStates.MODE_A_2:
+                background = self.background_images.COASTER
+
                 #Instruct which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot Center Spinner",True, (0,0,0))
+                mode_text = mode_font.render("Shoot Target 3",True, (0,0,0))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
                 #If shot made award points
-                if event == GameEvents.CENTER_SPINNER:
+                if event == GameEvents.TARGET_3:
+                    score = 1000
+                    #End mode and go back to qualifying modes
+                    self.current_state = MainModeStates.MODE_A_3
+                #Otherwise award basic scoring
+                else:
+                    score = basic_scoring(event,self.mode_vars)
+                #If ball ends, end mode and go back to qualifying modes
+                if event == GameEvents.BALL_END:
+                    self.current_state = MainModeStates.QUALIFYING_MODES
+                    
+            case MainModeStates.MODE_A_3:
+                background = self.background_images.COASTER
+                #Instruct which shot to make
+                mode_font = pygame.font.Font('Guardians.ttf', 72)
+                mode_text = mode_font.render("Shoot Target 4",True, (0,0,0))
+                animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
+                #If shot made award points
+                if event == GameEvents.TARGET_4:
                     score = 5000
+                    led_animations.append(SetIndicators('Fire Ramp Solonoid', 1, [Inserts.FIRE_COASTER_SOLONOID],True,None))
+                    #End mode and go back to qualifying modes
+                    self.current_state = MainModeStates.MODE_A_4
+                #Otherwise award basic scoring
+                else:
+                    score = basic_scoring(event,self.mode_vars)
+                #If ball ends, end mode and go back to qualifying modes
+                if event == GameEvents.BALL_END:
+                    self.current_state = MainModeStates.QUALIFYING_MODES
+
+
+            case MainModeStates.MODE_A_4:
+
+                background = self.background_images.COASTER
+                #Instruct which shot to make
+                mode_font = pygame.font.Font('Guardians.ttf', 72)
+                mode_text = mode_font.render("Coaster Built!",True, (0,0,0))
+                animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
+                #If shot made award points
+                if event == GameEvents.RIGHT_ORBIT:
+                    score = 5000
+                    led_animations.append(SetIndicators('Fire Ramp Solonoid', 1, [Inserts.FIRE_COASTER_SOLONOID],False,None))
                     #End mode and go back to qualifying modes
                     self.current_state = MainModeStates.QUALIFYING_MODES
                 #Otherwise award basic scoring
@@ -482,29 +568,26 @@ def GenerateModeList():
                 #If ball ends, end mode and go back to qualifying modes
                 if event == GameEvents.BALL_END:
                     self.current_state = MainModeStates.QUALIFYING_MODES
+
             case MainModeStates.MODE_B:
                 #Change background for this mode
-                background = self.background_images.BEARCAT
+                background = self.background_images.NORM
                 #Instruct player which shot to make
                 mode_font = pygame.font.Font('Guardians.ttf', 72)
-                mode_text = mode_font.render("Shoot Center Spinner",True, (0,0,0))
+               # mode_text = mode_font.render("Hit Pop Bumpers",True, (0,0,0))
+                mode_text = mode_font.render(f"Norm Health {self.mode_vars.norm_health}" ,True, (255,255,255))
                 animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,300))))
-                mode_font = pygame.font.Font('Guardians.ttf', 72)
-                #Show time remaining in this mode
-                mode_text = mode_font.render(f"Count Down {int(self.mode_vars.time_count/30)}",True, (0,0,0))
-                animations.append(EventAnimations.image_splash_hold(1,mode_text,mode_text.get_rect(center=(640,400))))                
-                #If it is a timer tick event, update time remaining
-                if event == GameEvents.TIME_TICK:
-                    self.mode_vars.time_count -= 1
-                    #If out of time, reset back to qualifying modes.
-                    if self.mode_vars.time_count <= 0:
-                        self.current_state = MainModeStates.QUALIFYING_MODES
-                #If spinner shot made, award points
-                if event == GameEvents.CENTER_SPINNER:
+                if event == GameEvents.POP_0 or event == GameEvents.POP_1:
                     score = 500
-                #Otherwise use basic scoring
+                    self.mode_vars.norm_health -= 500
                 else:
                     score = basic_scoring(event,self.mode_vars)
+
+                if self.mode_vars.norm_health <= 0:
+                    self.current_state = MainModeStates.QUALIFYING_MODES
+                    pygame.mixer.music.load('worky.mp3')
+                    pygame.mixer.music.play(-1)
+                    self.mode_vars.norm_health = 5000
                 #If ball ends, reset to qualifying modes
                 if event == GameEvents.BALL_END:
                     self.current_state = MainModeStates.QUALIFYING_MODES

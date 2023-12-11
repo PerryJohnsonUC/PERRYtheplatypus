@@ -10,7 +10,7 @@ from HonorsIndicator import SetIndicators
 class Machine_Settings:
 	balls_per_game = 3
 	ball_save_time = 20 #In seconds
-	n_max_players = 4
+	n_max_players = 2
 	def __init_(self):
 		pass
 
@@ -89,7 +89,7 @@ class Machine:
 	blink_count = 0
 	playfield_inserts = {} #Dictionary containing all playfield inserts
 	background = []
-	attract_background = pygame.transform.scale(pygame.image.load("Background_Images/Monogram.png"),(1280,720))
+	attract_background = pygame.transform.scale(pygame.image.load("Background_Images/P&F.jpg"),(1280,720))
 
 	def __init__(self) -> None:
 		self.playfield_inserts = GeneratePlayfieldIndicators()
@@ -117,7 +117,7 @@ class Machine:
 						self.player_count = 1
 						self.active_player_index = 0
 						self.active_player = self.player_list[self.active_player_index]
-						pygame.mixer.music.load('Background.mp3')
+						pygame.mixer.music.load('worky.mp3')
 						pygame.mixer.music.play(-1)
 						self.machine_state = MachineStates.PLAY_MODE
 						
